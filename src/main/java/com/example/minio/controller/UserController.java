@@ -4,7 +4,6 @@ import com.example.minio.dto.UserCreateDto;
 import com.example.minio.dto.UserGetDto;
 import com.example.minio.dto.UserUpdateDto;
 import com.example.minio.service.UserService;
-import com.example.minio.utils.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -59,11 +58,11 @@ public class UserController {
     //DELETE Mapping-Delete User
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "Jwt Token Authentication")
-    public ResponseEntity<ApiResponse> deleteUser(@PathVariable("id") UUID userId){
+    public ResponseEntity<String> deleteUser(@PathVariable("id") UUID userId){
         logger.info("Received request to delete user with ID : {}",userId);
         userService.deleteUserById(userId);
         logger.info("Returning response for delete user with ID : {}",userId);
-        return new ResponseEntity<>(new ApiResponse("User Deleted Successfully",true),HttpStatus.OK);
+        return new ResponseEntity<>("User Deleted Successfully",HttpStatus.OK);
     }
 
 }

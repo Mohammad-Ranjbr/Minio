@@ -16,7 +16,6 @@ public class UserGetDto{
     private String name;
     private String email;
     private String about;
-    private String gender;
     private String userName;
     private String phoneNumber;
     private LocalDateTime createdAt;
@@ -53,14 +52,6 @@ public class UserGetDto{
 
     public void setAbout(String about) {
         this.about = about;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
     }
 
     public String getUserName() {

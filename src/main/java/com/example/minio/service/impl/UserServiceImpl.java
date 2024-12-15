@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             User user = userMapper.toEntity(userCreateDto);
-
+            user.setImageName("default.png");
             User savedUser = userRepository.save(user);
             if(savedUser.getId() != null){
                 System.out.println(savedUser);
