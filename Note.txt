@@ -1,0 +1,282 @@
+Install and Deploy MinIO :
+
+1. Single-Node Single-Drive (SNSD)
+This is the simplest case:
+What is it?
+A MinIO server that uses only one storage space (such as a drive or a folder).
+When to use it?
+For testing and experimenting with MinIO or when you are just getting started.
+Advantages and limitations:
+If a drive fails, data is lost because there is no backup or redundancy mechanism.
+Suitable for use in non-sensitive or small projects.
+
+2. Single-Node Multi-Drive (SNMD)
+A step further than SNSD:
+What is it?
+A MinIO server that uses at least 4 storage drives instead of one.
+When to use it?
+When you want to split data across multiple drives so that if one drive fails, the data remains on the other drives.
+Advantages and limitations:
+Data is distributed across multiple drives, so if one drive fails, the data is not lost.
+There is still only one server, so if the server fails, the entire system is unavailable.
+
+3. Multi-Node Multi-Drive (MNMD)
+This mode is designed for use in large, professional environments:
+What is it?
+Multiple MinIO servers with a large number of drives working together, and data is distributed across servers and drives.
+When to use it?
+For production environments or when you need a robust and stable system.
+Advantages and limitations:
+If one server or multiple drives fail, the data is still available because it is stored on the remaining servers and drives.
+Very resilient, but more complex to set up and manage.
+You usually need orchestrated tools like Kubernetes to implement this architecture.
+
+Site Replication :
+
+Site Replication allows you to connect multiple MinIO servers together so that all data and settings are synchronized between them.
+This means that if you make a change on one server (such as adding a new file or user), the change will be applied to the other servers.
+
+What gets synced?
+When Site Replication is enabled, the following items are shared between servers:
+Files and folders: If you add or delete a file, the changes are applied to all servers.
+Settings: File locking rules (such as preventing accidental deletion).
+File encryption.
+Automatic rules, such as deleting files after a specified period of time.
+Users and permissions: If you add or remove a new user, the changes are reflected on all servers.
+User groups, roles, and access levels are synchronized.
+Versioning: If versioning is enabled for a file, this feature will be the same on all servers.
+
+Why use Site Replication?
+Backup:
+If one server fails, the data is safe on the other servers.
+Better accessibility:
+If users access data from different geographical locations, the data is served from the closest server.
+Full synchronization:
+All settings and data are the same on all servers.
+
+What Does Not Replicate?
+In Site Replication settings, some things are not synchronized between sites. These include:
+Bucket Notifications:
+Notifications that you set up to notify you of changes to buckets (for example, a new file is added) are not synchronized.
+Lifecycle Management (ILM) rules:
+Settings for automatically purging files or moving them to other storage are not replicated between sites.
+Site Settings:
+Local settings specific to each deployment (such as settings specific to a server) are not shared.
+
+Single-Node Single-Drive (SNSD) :
+
+This section describes how to set up MinIO in a Single-Node Single-Drive (SNSD) configuration for initial development and evaluation.
+In this configuration, MinIO uses a Zero-Parity Erasure Code backend, which means that this deployment does not have
+additional redundancy or reliability and relies only on the core storage capabilities. This configuration is suitable for
+local testing or small data loads that do not require high availability or performance.
+
+Zero-Parity Erasure Code :
+Zero-Parity Erasure Code is an encoding technique used to ensure data availability in storage systems.
+It is specifically used in systems such as MinIO to distribute data and increase stability and reliability.
+However, in Zero-Parity Erasure Code, unlike other encoding methods that store data with parity
+patches (to recover lost data), no additional parity is created to protect the data.
+
+How does it work?
+In Zero-Parity Erasure Code, data is divided into multiple parts, but no additional data (parity) is created
+to recover the lost pieces of data. In other words, if a piece of data is lost, it cannot be recovered from the other pieces.
+
+This method is typically used for development, testing, and test environments
+where high redundancy and stability are not required. In this configuration,
+only the data volume is stored in different pieces and if part of the data is lost, there is no protection mechanism to recover it.
+
+Advantages of Zero-Parity Erasure Code:
+Reduced complexity: Due to the lack of parity for data encoding, the storage and computational complexity is reduced.
+Storage space-saving: Since no redundant data is considered for recovery, less storage space is required.
+Disadvantages:
+Lack of protection against data loss: If part of the data is lost, it cannot be recovered.
+
+Filesystem: Data is stored as traditional files with a folder and path structure.
+Object Storage: Data is stored as objects with unique identifiers and metadata.
+
+MinIO and Filesystem:
+In MinIO, by default, data is stored as objects, not regular files.
+The filesystem backend in MinIO allows you to store data as files on the local filesystem,
+but this method is usually for testing and development and is not recommended in large-scale or production environments.
+
+Storage Requirements :
+Use Local Storage :
+
+1. Use Local Storage:
+Direct-Attached Storage (DAS) means using drives that are directly attached to the server,
+without the need for a network. This type of storage has many advantages:
+Higher performance: DAS typically performs better than network-attached storage
+(such as Network-Attached Storage (NAS) or Storage Area Network (SAN)) because data is read and written directly over the local connection.
+More stability: DAS has advantages in terms of concurrency and stability,
+because connecting directly to the server reduces latency and increases data access speed.
+MinIO strongly recommends using flash storage (such as NVMe or SSD) for primary or hot data
+(data that is accessed continuously). Using this type of storage makes data read and write
+speeds very fast and greatly improves system performance, especially in applications with large amounts of data and heavy loads.
+2. Use XFS format for drives:
+XFS is an advanced file system designed for use on storage drives in scalable and data-centric systems.
+MinIO recommends using XFS as the file system for drives.
+High compatibility: XFS is optimized for large data storage, parallel processing, and high I/O loads,
+so it is suitable for supporting large data and heavy operations on MinIO.
+Durability: XFS has features such as journaling that allow data to be recovered
+properly even in the event of sudden errors (such as system shutdown).
+
+DAS (Direct-Attached Storage) refers to a hard drive or drive that is directly connected
+to a server or computer, without being shared over a network or other devices.
+
+Object Management in MinIO
+Objects in object storage are binary data, such as audio files, spreadsheets, or even binary executable code.
+The term "binary large object" (BLOB) is commonly used to refer to objects, which can range in size from
+a few bytes to several terabytes. Object storage platforms like MinIO provide special tools and capabilities for storing, indexing,
+and retrieving objects, which are done using an S3-compatible API.
+
+Exclusive Access to Drives
+MinIO requires exclusive access to storage drives or volumes to store objects.
+This means that no other process, software, script, or person should be able to
+perform operations directly on the drives or volumes assigned to MinIO.
+This operation involves modifying, deleting, or moving files or objects that MinIO has placed on these drives or volumes.
+
+Data corruption: If you use tools or scripts to modify or move data stored in MinIO methods,
+this may result in massive data corruption that even MinIO cannot recover.
+This corruption may involve devices at various levels, including data (shards), parity data (balance), and metadata files (metadata).
+
+Why is exclusive access required?
+MinIO is designed based on the principles of data integrity and disaster recovery.
+Each unauthorized access to data can lead to data inconsistencies and recoverable
+corruption that the system cannot restore to a previous state. Therefore,
+performing multiple unauthorized operations on drives or volumes should be avoided.
+
+A bucket in MinIO is like a folder or directory that holds different objects.
+
+In MinIO, each object that is uploaded belongs to a specific path,
+which is similar to the path of a file in your operating system. For example,
+suppose you upload an image named image1.jpg to a bucket named /images.
+The full path of this image becomes: /images/image1.jpg
+
+Here, images is considered as a prefix that helps the system to have a folder
+(directory) structure similar to the file system, except that MinIO automatically creates these prefixes.
+
+Now, suppose you have several images and videos, each categorized in different folders.
+Instead of manually creating folders for each category (e.g. /images, /videos), you just give a full object name, like:
+/images/nature/image1.jpg
+/videos/travel/video1.mp4
+In this case, MinIO automatically creates the middle prefixes /nature/ and /travel/ similar to
+filesystem directories. You as the user do not need to create these folders, MinIO does it automatically.
+
+MinIO supports two different ways to access buckets: path-style and virtual-host-style.
+These two methods define how buckets are accessed via URL.
+Below we explain how these two methods differ and how they work.
+
+1. Path-Style Lookup:
+In this method, when accessing a bucket in MinIO, you need to include the
+full path address including the bucket name in the URL. For example,
+if your MinIO domain is minio.example.net and you have a bucket named mybucket, the URL will be:
+
+minio.example.net/mybucket
+Here, mybucket is considered a path and there is no need to define a subdomain.
+
+2. Virtual-Host Lookup:
+In this method, buckets are accessed via subdomains. Each bucket is assigned to a separate subdomain.
+For example, to access the bucket mybucket via the domain minio.example.net, the URL would be:
+
+mybucket.minio.example.net
+Here, mybucket is considered a subdomain and automatically points to the corresponding bucket in MinIO.
+
+How to enable Virtual-Host Lookup:
+In order for MinIO to use the virtual-host-style, you need to set the environment variable
+MINIO_DOMAIN to a valid domain (Fully Qualified Domain Name or FQDN) that points to MinIO.
+
+2. Hardware and Performance Limitations
+MinIO does not have a specific limit on the number of buckets, objects, or prefixes.
+But the actual performance depends on the hardware (such as disk speed) and network infrastructure:
+Slow hardware or poor network: If a large number of objects are stored in a flat hierarchy, performance will degrade.
+Advanced hardware: Can handle a very large number of objects (millions or more) in prefixes.
+
+For proper design, you need to consider the hardware capacity and the application workload:
+If you have average or budget-limited hardware, try to store a maximum of 10,000 objects per prefix.
+If you are using advanced or enterprise-grade hardware, you can have prefixes with millions of objects.
+
+Object Versioning in MinIO determines how the service behaves when performing various operations
+(such as writing, reading, listing, or deleting objects). The versioning state of a bucket can be one of three states: Enabled, Disabled, or Suspended.
+
+Effect of versioning state on operations:
+
+1. Write (PUT)
+Enabled versioning:
+For each write, a new version of the object is created as the "latest".
+The new object is assigned a unique version ID.
+Disabled or Suspended versioning:
+If an object with the same name already exists in the bucket, the previous data is overwritten.
+
+2. Get (GET)
+Versioning Enabled:
+By default, the latest version of the object is retrieved.
+It is also possible to retrieve specific versions of an object by specifying the version ID.
+Versioning Disabled or Suspended (Disabled | Suspended):
+Only the latest version of the object is retrieved.
+
+3. LIST
+Versioning Enabled:
+Retrieves a list of the latest versions of objects in the specified bucket or prefix.
+You can view all versions of an object and their associated version IDs.
+Versioning Disabled | Suspended:
+The list only includes all objects in the specified bucket or prefix.
+
+4. DELETE
+Versioning Enabled:
+A delete operation creates a zero-byte Delete Marker for the object, marking it as the "latest" version.
+Soft delete is performed and previous versions can be restored.
+It is also possible to hard delete specific versions of an object using the Version ID.
+Disabled or Suspended Versioning (Disabled | Suspended):
+The object is deleted directly and cannot be recovered.
+
+Object Tagging :
+
+In MinIO, Object Tagging allows you to add custom tags to objects. These tags are key-value pairs that are stored in the metadata of each object.
+
+Object Tagging uses:
+Access control: You can use tags in access policies. This means that access to specific objects can be set based on their tags.
+Object search and filtering: You can find objects based on their tags using commands like mc find --tags.
+
+Limitations:
+Each object can have a maximum of 10 custom tags.
+
+Object Lifecycle Management :
+
+Object Lifecycle Management in MinIO is a feature that allows you to set scheduled rules
+for automatic transition (Transition) or automatic deletion (Expiry) of objects. This feature
+is useful for automatic object lifecycle management and can help optimize storage space and reduce costs.
+
+Features and Applications:
+Object Transition:
+MinIO automatically moves objects to a remote storage tier.
+
+This feature is suitable for moving less frequently used data to cheaper storage.
+
+Object Expiry:
+MinIO automatically deletes expired objects. It is useful for cleaning up data that is no longer needed and reducing storage costs.
+
+Transition rule: Specifies after how many days or on what date objects should be moved to another space.
+Expiry rule: Specifies after how many days or on what date objects should be deleted.
+
+Target Bucket Considerations is a section of the MinIO documentation that addresses
+considerations and limitations related to using the Target Bucket in data migration scenarios.
+It emphasizes that the target bucket should be managed in a
+way that does not interfere with or cause problems in the data migration process.
+
+Important points about the target bucket:
+No need for matching settings:
+MinIO does not require that the Object Management or Versioning settings between the source and target buckets be consistent.
+However, if you define rules for the target bucket, you should do so carefully.
+
+Prohibiting additional rules:
+The target bucket should not include lifecycle management rules such as expiration or tiering.
+Expiration rules can cause data that is still in use in the source bucket to be deleted.
+Tiering adds operational complexity and network latency.
+
+Object Locking and Versioning:
+You can enable versioning or object locking on the destination bucket.
+However, these settings can have the following effects:
+Object Locking: May prevent the source bucket from deleting objects.
+Versioning: MinIO uses a unique UUID for transferred objects, so
+versioning is redundant on the destination bucket and reduces storage efficiency.
+Delete Marker: Deleting objects results in a delete mark that does not free up space.
+
