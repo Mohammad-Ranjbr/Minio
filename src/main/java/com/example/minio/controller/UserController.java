@@ -4,7 +4,6 @@ import com.example.minio.dto.UserCreateDto;
 import com.example.minio.dto.UserGetDto;
 import com.example.minio.dto.UserUpdateDto;
 import com.example.minio.service.UserService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,6 @@ public class UserController {
 
     //PUT Mapping-Update User
     @PutMapping("/{id}")
-    @SecurityRequirement(name = "Jwt Token Authentication")
     public ResponseEntity<UserGetDto> updateUser(@Valid @RequestBody UserUpdateDto userUpdateDto, @PathVariable("id") UUID userId){
         logger.info("Received request to update user with ID : {}",userId);
         UserGetDto updatedUser = userService.updateUser(userUpdateDto,userId);
@@ -57,7 +55,6 @@ public class UserController {
 
     //DELETE Mapping-Delete User
     @DeleteMapping("/{id}")
-    @SecurityRequirement(name = "Jwt Token Authentication")
     public ResponseEntity<String> deleteUser(@PathVariable("id") UUID userId){
         logger.info("Received request to delete user with ID : {}",userId);
         userService.deleteUserById(userId);
