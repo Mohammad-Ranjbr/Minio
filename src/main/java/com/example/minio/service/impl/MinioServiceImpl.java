@@ -59,4 +59,35 @@ public class MinioServiceImpl implements MinioService {
         return message;
     }
 
+    @Override
+    public String makeBucketWithObjectLock(String bucketName) {
+        // When the Object Lock feature is enabled, you can specify that objects in the bucket are protected and no one can modify or delete them, even if they have system administration.
+        // Two main Object Lock modes:
+        // Governance Mode:
+        // In this mode, users with special permissions (usually administrators or those with high permissions) can delete or modify objects, but it will be impossible for users to change or delete objects.
+        // This mode allows you to protect objects, but at the same time there may be changes or emergencies for legal with special access.
+        // Compliance Mode:
+        // In this mode, Object Lock is fully and irreversibly enabled. No one can delete or modify locked objects, even if they have administrative access. This mode is usually suitable for use in industries that require compliance with regulations (such as legal record keeping and accounting).
+        // If Object Lock is enabled in Compliance Mode, this lock cannot be changed from its application.
+        // Governance Mode is enabled by default, unless you specifically configure Compliance Mode.
+
+        String message = "";
+        if(!bucketExists(bucketName)){
+            try{
+                minioClient.makeBucket(
+                        MakeBucketArgs.builder()
+                                .bucket(bucketName)
+                                .objectLock(true)
+                                .build());
+                message = bucketName + "is created successfully";
+                logger.info(message);
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            message = bucketName + "already is exists";
+        }
+        return message;
+    }
+
 }

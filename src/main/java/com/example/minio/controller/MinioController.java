@@ -20,15 +20,21 @@ public class MinioController {
         this.minioService = minioService;
     }
 
-    @GetMapping("/exists-bucket/{bucketName}")
+    @GetMapping("/buckets/exists/{bucketName}")
     public ResponseEntity<String> existsBucket(@PathVariable("bucketName") String bucketName){
         boolean found = minioService.bucketExists(bucketName);
         return new ResponseEntity<>("Bucket exists: " + found, HttpStatus.OK);
     }
 
-    @PostMapping("/make-bucket/{bucketName}")
+    @PostMapping("/buckets/create/{bucketName}")
     public ResponseEntity<String> makeBucket(@PathVariable("bucketName") String bucketName){
         String message = minioService.makeBucket(bucketName);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/buckets/create-with-lock/{bucketName}")
+    public ResponseEntity<String> makeBucketWithLockObject(@PathVariable("bucketName") String bucketName){
+        String message = minioService.makeBucketWithObjectLock(bucketName);
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
