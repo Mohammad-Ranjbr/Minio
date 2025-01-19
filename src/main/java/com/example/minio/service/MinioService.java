@@ -6,5 +6,6 @@ public interface MinioService {
     String makeBucket(String bucketName);
     String makeBucketWithObjectLock(String bucketName);
     String uploadStringToBucket(String bucketName, String objectName);
+    String uploadStringToBucketWithS3DefaultEncryption(String bucketName, String objectName);
 
 }

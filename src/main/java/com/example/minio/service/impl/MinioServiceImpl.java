@@ -1,10 +1,7 @@
 package com.example.minio.service.impl;
 
 import com.example.minio.service.MinioService;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import io.minio.errors.MinioException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +105,35 @@ public class MinioServiceImpl implements MinioService {
                 ByteArrayInputStream bais = new ByteArrayInputStream(createContent().toString().getBytes(StandardCharsets.UTF_8));
                 minioClient.putObject(
                         PutObjectArgs.builder().bucket(bucketName).object(objectName).stream(bais, bais.available(), -1)
+                                .build());
+                bais.close();
+                message = objectName + " is uploaded successfully";
+                logger.info(message);
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            message = bucketName + " does not exists";
+            logger.warn(message);
+        }
+        return message;
+    }
+
+    @Override
+    public String uploadStringToBucketWithS3DefaultEncryption(String bucketName, String objectName) {
+        // SSE-S3 (S3 Default Encryption): This method of encrypting data is automatically enabled in cloud storage services such as AWS S3 and MinIO,
+        // and automatically uses a default internal key. For every object uploaded to these services, data is encrypted with SSE-S3 by default.
+        // Encryption on upload: When you upload data, it is automatically encrypted by the storage system (S3 or MinIO). There is no need to set encryption keys and this is done by default.
+        //Retrieving data: When you retrieve the data (using getObject), the storage system automatically decrypts the encrypted data,
+        // and you receive understandable data. In this case, you don't need to worry about encryption because it is done transparently in the background.
+        String message = "";
+        if(bucketExists(bucketName)){
+            try{
+                ServerSideEncryption sseS3 = new ServerSideEncryptionS3();
+                ByteArrayInputStream bais = new ByteArrayInputStream(createContent().toString().getBytes(StandardCharsets.UTF_8));
+                minioClient.putObject(
+                        PutObjectArgs.builder().bucket(bucketName).object(objectName).stream(bais, bais.available(), -1)
+                                .sse(sseS3)
                                 .build());
                 bais.close();
                 message = objectName + " is uploaded successfully";

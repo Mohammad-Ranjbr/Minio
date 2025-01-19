@@ -44,4 +44,10 @@ public class MinioController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
+    @PostMapping("/uploadWithEncryption")
+    public ResponseEntity<String> uploadStringToBucketWithS3DefaultEncryption(@RequestParam String bucketName, @RequestParam String objectName){
+        String message = minioService.uploadStringToBucketWithS3DefaultEncryption(bucketName, objectName);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
 }
