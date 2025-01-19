@@ -38,4 +38,10 @@ public class MinioController {
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
+    @PostMapping("/uploadToBucket")
+    public ResponseEntity<String> uploadStringToBucket(@RequestParam String bucketName, @RequestParam String objectName){
+        String message = minioService.uploadStringToBucket(bucketName, objectName);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
 }
