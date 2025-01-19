@@ -1,7 +1,5 @@
 package com.example.minio.exception;
 
-import com.example.minio.utils.ApplicationConstants;
-import com.example.minio.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
