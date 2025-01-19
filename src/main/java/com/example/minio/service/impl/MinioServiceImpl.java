@@ -2,6 +2,7 @@ package com.example.minio.service.impl;
 
 import com.example.minio.service.MinioService;
 import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.errors.MinioException;
 import org.slf4j.Logger;
@@ -26,18 +27,36 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public boolean bucketExists(String bucketName) {
+        boolean exists = false;
         try{
             boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (found){
                 logger.info(bucketName + " exists");
-                return true;
+                exists = true;
             } else {
                 logger.info(bucketName + " does not exists");
             }
         } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException exception){
             logger.error("Error occurred: " + exception);
         }
-        return false;
+        return exists;
+    }
+
+    @Override
+    public String makeBucket(String bucketName) {
+        String message = "";
+        if(!bucketExists(bucketName)){
+            try{
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+                message = bucketName + "is created successfully";
+                logger.info(message);
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            message = bucketName + "already is exists";
+        }
+        return message;
     }
 
 }
