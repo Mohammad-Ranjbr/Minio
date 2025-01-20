@@ -62,4 +62,10 @@ public class MinioController {
         return new ResponseEntity<>(content, HttpStatus.OK);
     }
 
+    @GetMapping("/listBuckets")
+    public ResponseEntity<String> listBuckets(){
+        String content = minioService.listBuckets();
+        return new ResponseEntity<>(content, HttpStatus.OK);
+    }
+
 }

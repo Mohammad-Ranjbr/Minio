@@ -3,6 +3,7 @@ package com.example.minio.service.impl;
 import com.example.minio.service.MinioService;
 import io.minio.*;
 import io.minio.errors.MinioException;
+import io.minio.messages.Bucket;
 import io.minio.messages.SseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 @Service
 public class MinioServiceImpl implements MinioService {
@@ -202,6 +204,21 @@ public class MinioServiceImpl implements MinioService {
             logger.warn(content);
         }
         return content;
+    }
+
+    @Override
+    public String listBuckets() {
+        try {
+            List<Bucket> buckets = minioClient.listBuckets();
+            StringBuilder result = new StringBuilder();
+            for(Bucket bucket:buckets){
+                result.append(bucket.creationDate()).append(", ").append(bucket.name()).append("\n");
+            }
+            return result.toString();
+        } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+        }
+        return null;
     }
 
     private StringBuilder createContent(){
