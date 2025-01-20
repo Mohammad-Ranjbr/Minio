@@ -249,6 +249,13 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public String setBucketVersioning(String bucketName) {
+        // Bucket Versioning is an important feature in MinIO and S3 that allows you to manage different versions of an object.
+        // This feature allows you to control accidental changes or deletions in the data and revert to previous versions.
+        // When Bucket Versioning is enabled, every time an object with the same name is uploaded to a bucket, a new version is created instead of being replaced.
+        // Example: If a file named document.txt is uploaded to a bucket and uploaded again with the same name, the previous version is not deleted but is stored as an old version.
+        // Protection against accidental deletion of data:
+        // With versioning enabled, deleting an object does not mean deleting all versions. Rather,
+        // a Delete Marker is added to indicate the deletion of the object, but the previous versions are still available unless you delete specific versions.
         String message = "";
         if(bucketExists(bucketName)){
             try {
@@ -257,6 +264,24 @@ public class MinioServiceImpl implements MinioService {
                                 .config(new VersioningConfiguration(VersioningConfiguration.Status.ENABLED, null))
                                 .build());
                 message = "Bucket versioning is enabled successfully for " + bucketName;
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            message = bucketName + " does not exists";
+            logger.warn(message);
+        }
+        return message;
+    }
+
+    @Override
+    public String getBucketVersioning(String bucketName) {
+        String message = "";
+        if(bucketExists(bucketName)){
+            try {
+                VersioningConfiguration config = minioClient.getBucketVersioning(
+                    GetBucketVersioningArgs.builder().bucket(bucketName).build());
+                message = config.status().toString();
             } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
                 logger.error("Error occurred: " + exception);
             }

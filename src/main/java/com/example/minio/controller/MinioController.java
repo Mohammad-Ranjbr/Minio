@@ -64,7 +64,7 @@ public class MinioController {
         return new ResponseEntity<>(content, HttpStatus.OK);
     }
 
-    @GetMapping("/listBuckets")
+    @GetMapping("/buckets/lists")
     public ResponseEntity<String> listBuckets(){
         String content = minioService.listBuckets();
         return new ResponseEntity<>(content, HttpStatus.OK);
@@ -79,6 +79,12 @@ public class MinioController {
     @PostMapping("/buckets/setVersioning/{bucketName}")
     public ResponseEntity<String> setBucketVersioning(@PathVariable("bucketName") String bucketName){
         String message = minioService.setBucketVersioning(bucketName);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @GetMapping("/buckets/getVersioning/{bucketName}")
+    public ResponseEntity<String> getBucketVersioning(@PathVariable("bucketName") String bucketName){
+        String message = minioService.getBucketVersioning(bucketName);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
