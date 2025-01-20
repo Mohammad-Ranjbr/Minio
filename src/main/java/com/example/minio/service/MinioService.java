@@ -12,5 +12,6 @@ public interface MinioService {
     String setBucketEncryption(String bucketName);
     String getStringFromBucket(String bucketName, String objectName);
     String listBuckets();
+    List<String> listObjects(String bucketName);
 
 }

@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/minio")
 public class MinioController {
@@ -65,6 +67,12 @@ public class MinioController {
     @GetMapping("/listBuckets")
     public ResponseEntity<String> listBuckets(){
         String content = minioService.listBuckets();
+        return new ResponseEntity<>(content, HttpStatus.OK);
+    }
+
+    @GetMapping("/listObjects/{bucketName}")
+    public ResponseEntity<List<String>> listObjects(@PathVariable("bucketName") String bucketName){
+        List<String> content = minioService.listObjects(bucketName);
         return new ResponseEntity<>(content, HttpStatus.OK);
     }
 

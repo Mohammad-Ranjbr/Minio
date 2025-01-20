@@ -4,6 +4,7 @@ import com.example.minio.service.MinioService;
 import io.minio.*;
 import io.minio.errors.MinioException;
 import io.minio.messages.Bucket;
+import io.minio.messages.Item;
 import io.minio.messages.SseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -219,6 +221,29 @@ public class MinioServiceImpl implements MinioService {
                 logger.error("Error occurred: " + exception);
         }
         return null;
+    }
+
+    @Override
+    public List<String> listObjects(String bucketName) {
+        List<String> objectDetails = new ArrayList<>();
+        if(bucketExists(bucketName)){
+            try {
+                Iterable<Result<Item>> results =
+                        minioClient.listObjects(ListObjectsArgs.builder().bucket(bucketName).build());
+                for (Result<Item> result:results){
+                    Item item = result.get();
+                    String itemDetail = item.lastModified() + "     " + item.size() + "     " + item.objectName();
+                    objectDetails.add(itemDetail);
+                }
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            String message = bucketName + " does not exist";
+            logger.warn(message);
+            objectDetails.add(message);
+        }
+        return objectDetails;
     }
 
     private StringBuilder createContent(){
