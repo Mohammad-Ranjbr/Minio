@@ -3,6 +3,7 @@ package com.example.minio.service.impl;
 import com.example.minio.service.MinioService;
 import io.minio.*;
 import io.minio.errors.MinioException;
+import io.minio.messages.SseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,6 +138,26 @@ public class MinioServiceImpl implements MinioService {
                                 .build());
                 bais.close();
                 message = objectName + " is uploaded successfully";
+                logger.info(message);
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            message = bucketName + " does not exists";
+            logger.warn(message);
+        }
+        return message;
+    }
+
+    @Override
+    public String setBucketEncryption(String bucketName) {
+        String message = "";
+        if(bucketExists(bucketName)){
+            try{
+                minioClient.setBucketEncryption(
+                        SetBucketEncryptionArgs.builder().bucket(bucketName).config(SseConfiguration.newConfigWithSseS3Rule())
+                        .build());
+                message = "Encryption configuration of " + bucketName + " is set successfully";
                 logger.info(message);
             } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
                 logger.error("Error occurred: " + exception);

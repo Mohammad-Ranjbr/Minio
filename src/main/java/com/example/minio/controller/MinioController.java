@@ -50,4 +50,10 @@ public class MinioController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
+    @PostMapping("/setBucketEncryption")
+    public ResponseEntity<String> setBucketEncryption(@RequestParam String bucketName){
+        String message = minioService.setBucketEncryption(bucketName);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
 }
