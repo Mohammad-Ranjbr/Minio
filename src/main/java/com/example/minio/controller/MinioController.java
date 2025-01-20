@@ -76,4 +76,10 @@ public class MinioController {
         return new ResponseEntity<>(content, HttpStatus.OK);
     }
 
+    @PostMapping("/buckets/setVersioning/{bucketName}")
+    public ResponseEntity<String> setBucketVersioning(@PathVariable("bucketName") String bucketName){
+        String message = minioService.setBucketVersioning(bucketName);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
 }

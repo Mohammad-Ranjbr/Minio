@@ -6,6 +6,7 @@ import io.minio.errors.MinioException;
 import io.minio.messages.Bucket;
 import io.minio.messages.Item;
 import io.minio.messages.SseConfiguration;
+import io.minio.messages.VersioningConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -244,6 +245,26 @@ public class MinioServiceImpl implements MinioService {
             objectDetails.add(message);
         }
         return objectDetails;
+    }
+
+    @Override
+    public String setBucketVersioning(String bucketName) {
+        String message = "";
+        if(bucketExists(bucketName)){
+            try {
+                minioClient.setBucketVersioning(
+                        SetBucketVersioningArgs.builder().bucket(bucketName)
+                                .config(new VersioningConfiguration(VersioningConfiguration.Status.ENABLED, null))
+                                .build());
+                message = "Bucket versioning is enabled successfully for " + bucketName;
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            message = bucketName + " does not exists";
+            logger.warn(message);
+        }
+        return message;
     }
 
     private StringBuilder createContent(){

@@ -13,5 +13,6 @@ public interface MinioService {
     String getStringFromBucket(String bucketName, String objectName);
     String listBuckets();
     List<String> listObjects(String bucketName);
+    String setBucketVersioning(String bucketName);
 
 }
