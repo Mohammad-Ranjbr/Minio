@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -125,7 +126,7 @@ public class MinioServiceImpl implements MinioService {
         // SSE-S3 (S3 Default Encryption): This method of encrypting data is automatically enabled in cloud storage services such as AWS S3 and MinIO,
         // and automatically uses a default internal key. For every object uploaded to these services, data is encrypted with SSE-S3 by default.
         // Encryption on upload: When you upload data, it is automatically encrypted by the storage system (S3 or MinIO). There is no need to set encryption keys and this is done by default.
-        //Retrieving data: When you retrieve the data (using getObject), the storage system automatically decrypts the encrypted data,
+        // Retrieving data: When you retrieve the data (using getObject), the storage system automatically decrypts the encrypted data,
         // and you receive understandable data. In this case, you don't need to worry about encryption because it is done transparently in the background.
         String message = "";
         if(bucketExists(bucketName)){
@@ -151,6 +152,7 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public String setBucketEncryption(String bucketName) {
+        // A secure connection is required to set up encryption for the bucket.
         String message = "";
         if(bucketExists(bucketName)){
             try{
@@ -167,6 +169,39 @@ public class MinioServiceImpl implements MinioService {
             logger.warn(message);
         }
         return message;
+    }
+
+    @Override
+    public String getStringFromBucket(String bucketName, String objectName) {
+        // When reading data from an input source such as a file or network, it is usually not efficient to read each byte of data directly. Instead, we use a buffer, which stores the data in larger chunks (multiple bytes) and then process these chunks more efficiently.
+        // When data is read from an input stream (InputStream), the data is first stored in a buffer.
+        // Instead of reading one byte at a time, multiple bytes are read at once and stored in a byte array (such as byte[]).
+        // We can then process the data stored in the buffer, without having to access the original data source again.
+        // Improved performance: Reading or writing data in larger chunks is much faster than processing each byte individually.
+        // Reduced resource accesses: There is a time delay each time we access the disk or network. Buffering data reduces the number of these accesses.
+        // Better memory management: Buffers allow you to load a specific amount of data into memory and have more control over the size of the data being processed instead of using all the memory.
+        // Reading data in chunks saves memory. Instead of loading the entire file at once, the file is read in small chunks, which improves efficiency and performance.
+        String content = "";
+        if(bucketExists(bucketName)){
+            try {
+                InputStream stream =
+                        minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(objectName).build());
+                StringBuilder result = new StringBuilder();
+                byte[] buf = new byte[16384];
+                int bytesRead;
+                while((bytesRead = stream.read(buf, 0, buf.length)) >= 0){
+                    result.append(new String(buf, 0, bytesRead, StandardCharsets.UTF_8));
+                }
+                stream.close();
+                content = result.toString();
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            content = bucketName + " does not exists";
+            logger.warn(content);
+        }
+        return content;
     }
 
     private StringBuilder createContent(){

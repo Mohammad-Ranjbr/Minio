@@ -56,4 +56,10 @@ public class MinioController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
+    @GetMapping("/getFromBucket")
+    public ResponseEntity<String> getStringFromBucket(@RequestParam String bucketName, @RequestParam String objectName){
+        String content = minioService.getStringFromBucket(bucketName, objectName);
+        return new ResponseEntity<>(content, HttpStatus.OK);
+    }
+
 }
