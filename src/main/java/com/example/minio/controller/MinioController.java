@@ -104,4 +104,10 @@ public class MinioController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @PostMapping("/buckets/{bucket-name}/setTags")
+    public ResponseEntity<String> setBucketTags(@PathVariable("bucket-name") String bucketName){
+        String message = minioService.setBucketTags(bucketName);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
 }

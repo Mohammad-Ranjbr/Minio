@@ -18,5 +18,6 @@ public interface MinioService {
     String getObjectVersions(String bucketName, String objectName);
     String getObjectByVersion(String bucketName, String objectName, String versionId);
     String getBucketLifecycle(String bucketName);
+    String setBucketTags(String bucketNam);
 
 }

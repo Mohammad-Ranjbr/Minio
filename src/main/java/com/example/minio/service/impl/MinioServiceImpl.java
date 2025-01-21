@@ -16,7 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MinioServiceImpl implements MinioService {
@@ -362,6 +364,30 @@ public class MinioServiceImpl implements MinioService {
             logger.warn(result.toString());
         }
         return result.toString();
+    }
+
+    @Override
+    public String setBucketTags(String bucketNam) {
+        // Tags can be used to categorize and organize buckets by projects, environments (such as Production, Staging), teams, or any other field that helps with better management.
+        // Tags can be used to define access policies (IAM Policies). You can set specific access based on specific tags.
+        // Tags are used to set lifecycle rules, so that old or unimportant files are automatically deleted or archived.
+        // In systems with a large number of buckets and files, tags can help with better and faster searching for buckets and files.
+        String message = "";
+        if(bucketExists(bucketNam)){
+            try{
+                Map<String, String> tags = new HashMap<>();
+                tags.put("Project", "Integration Minio and Spring Boot");
+                tags.put("User", "Mohammad Ranjbar");
+                minioClient.setBucketTags(SetBucketTagsArgs.builder().bucket(bucketNam).tags(tags).build());
+                message = "Tags have been successfully set for bucket: " + bucketNam;
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else{
+            message = bucketNam + " does not exists";
+            logger.warn(message);
+        }
+        return message;
     }
 
     private StringBuilder createContent(){
