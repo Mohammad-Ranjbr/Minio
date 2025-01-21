@@ -98,7 +98,7 @@ public class MinioServiceImpl implements MinioService {
     }
 
     @Override
-    public String uploadStringToBucket(String bucketName, String objectName) {
+    public String uploadObjectToBucket(String bucketName, String objectName) {
         // In MinIO (and similar services like S3), to upload any object to the server, the data must be sent to the service as an InputStream or byte stream.
         // This means that any data you want to upload must first be converted to a stream so that MinIO can process and store it.
 
@@ -127,7 +127,7 @@ public class MinioServiceImpl implements MinioService {
     }
 
     @Override
-    public String uploadStringToBucketWithS3DefaultEncryption(String bucketName, String objectName) {
+    public String uploadObjectToBucketWithS3DefaultEncryption(String bucketName, String objectName) {
         // SSE-S3 (S3 Default Encryption): This method of encrypting data is automatically enabled in cloud storage services such as AWS S3 and MinIO,
         // and automatically uses a default internal key. For every object uploaded to these services, data is encrypted with SSE-S3 by default.
         // Encryption on upload: When you upload data, it is automatically encrypted by the storage system (S3 or MinIO). There is no need to set encryption keys and this is done by default.
@@ -177,7 +177,7 @@ public class MinioServiceImpl implements MinioService {
     }
 
     @Override
-    public String getStringFromBucket(String bucketName, String objectName) {
+    public String getObjectFromBucket(String bucketName, String objectName) {
         // When reading data from an input source such as a file or network, it is usually not efficient to read each byte of data directly. Instead, we use a buffer, which stores the data in larger chunks (multiple bytes) and then process these chunks more efficiently.
         // When data is read from an input stream (InputStream), the data is first stored in a buffer.
         // Instead of reading one byte at a time, multiple bytes are read at once and stored in a byte array (such as byte[]).
@@ -186,27 +186,25 @@ public class MinioServiceImpl implements MinioService {
         // Reduced resource accesses: There is a time delay each time we access the disk or network. Buffering data reduces the number of these accesses.
         // Better memory management: Buffers allow you to load a specific amount of data into memory and have more control over the size of the data being processed instead of using all the memory.
         // Reading data in chunks saves memory. Instead of loading the entire file at once, the file is read in small chunks, which improves efficiency and performance.
-        String content = "";
+        StringBuilder result = new StringBuilder();
         if(bucketExists(bucketName)){
             try {
                 InputStream stream =
                         minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(objectName).build());
-                StringBuilder result = new StringBuilder();
                 byte[] buf = new byte[16384];
                 int bytesRead;
                 while((bytesRead = stream.read(buf, 0, buf.length)) >= 0){
                     result.append(new String(buf, 0, bytesRead, StandardCharsets.UTF_8));
                 }
                 stream.close();
-                content = result.toString();
             } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
                 logger.error("Error occurred: " + exception);
             }
         } else {
-            content = bucketName + " does not exists";
-            logger.warn(content);
+            result.append(bucketName).append(" does not exists");
+            logger.warn(result.toString());
         }
-        return content;
+        return result.toString();
     }
 
     @Override
@@ -323,6 +321,30 @@ public class MinioServiceImpl implements MinioService {
             logger.warn(versionsContent.toString());
         }
         return versionsContent.toString();
+    }
+
+    @Override
+    public String getObjectByVersion(String bucketName, String objectName, String versionId) {
+        StringBuilder result = new StringBuilder();
+        if(bucketExists(bucketName)){
+            try{
+                InputStream stream = minioClient.getObject(
+                        GetObjectArgs.builder().bucket(bucketName).object(objectName).versionId(versionId).build());
+
+                byte[] buf = new byte[16384];
+                int readBytes;
+                while ((readBytes = stream.read(buf, 0, buf.length)) >= 0){
+                    result.append(new String(buf, 0, readBytes, StandardCharsets.UTF_8));
+                }
+                stream.close();
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            result.append(bucketName).append(" does not exists");
+            logger.warn(result.toString());
+        }
+        return result.toString();
     }
 
     private StringBuilder createContent(){

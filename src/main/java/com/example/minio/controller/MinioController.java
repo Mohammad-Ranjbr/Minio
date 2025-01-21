@@ -42,13 +42,13 @@ public class MinioController {
 
     @PostMapping("/uploadToBucket")
     public ResponseEntity<String> uploadStringToBucket(@RequestParam String bucketName, @RequestParam String objectName){
-        String message = minioService.uploadStringToBucket(bucketName, objectName);
+        String message = minioService.uploadObjectToBucket(bucketName, objectName);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
     @PostMapping("/uploadWithEncryption")
     public ResponseEntity<String> uploadStringToBucketWithS3DefaultEncryption(@RequestParam String bucketName, @RequestParam String objectName){
-        String message = minioService.uploadStringToBucketWithS3DefaultEncryption(bucketName, objectName);
+        String message = minioService.uploadObjectToBucketWithS3DefaultEncryption(bucketName, objectName);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -60,7 +60,7 @@ public class MinioController {
 
     @GetMapping("/getFromBucket")
     public ResponseEntity<String> getStringFromBucket(@RequestParam String bucketName, @RequestParam String objectName){
-        String content = minioService.getStringFromBucket(bucketName, objectName);
+        String content = minioService.getObjectFromBucket(bucketName, objectName);
         return new ResponseEntity<>(content, HttpStatus.OK);
     }
 
@@ -91,6 +91,13 @@ public class MinioController {
     @GetMapping("/buckets/{bucket-name}/Object/{object-name}/versions")
     public ResponseEntity<String> getObjectVersions(@PathVariable("bucket-name") String bucketName, @PathVariable("object-name") String objectName){
         String result = minioService.getObjectVersions(bucketName, objectName);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/buckets/{bucket-name}/objects/{object-name}/versions/{version-id}")
+    public ResponseEntity<String> getObjectByVersion(@PathVariable("bucket-name") String bucketName,
+                                                     @PathVariable("object-name") String objectName, @PathVariable("version-id") String versionId){
+        String result = minioService.getObjectByVersion(bucketName, objectName, versionId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
