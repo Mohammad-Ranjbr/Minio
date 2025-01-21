@@ -425,6 +425,26 @@ public class MinioServiceImpl implements MinioService {
         return message;
     }
 
+    @Override
+    public String setObjectTags(String bucketName, String objectName) {
+        String message = "";
+        if(bucketExists(bucketName)){
+            try {
+                Map<String, String> tags = new HashMap<>();
+                tags.put("Project", "Integration Minio and Spring Boot");
+                tags.put("User", "Mohammad Ranjbar");
+                minioClient.setObjectTags(SetObjectTagsArgs.builder().bucket(bucketName).object(objectName).tags(tags).build());
+                message = "Tags have been successfully set for object: " + objectName;
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            message = bucketName + " does not exists";
+            logger.warn(message);
+        }
+        return message;
+    }
+
     private StringBuilder createContent(){
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 1000; i++) {
