@@ -22,5 +22,6 @@ public interface MinioService {
     String getBucketTags(String bucketName);
     String deleteBucketTags(String bucketName);
     String setObjectTags(String bucketName, String objectName);
+    String getObjectTags(String bucketName, String objectName);
 
 }

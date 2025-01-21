@@ -128,4 +128,10 @@ public class MinioController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
+    @GetMapping("/buckets/{bucket-name}/objects/{object-name}/getTags")
+    public ResponseEntity<String> getObjectTags(@PathVariable("bucket-name") String bucketName, @PathVariable("object-name") String objectName){
+        String result = minioService.getObjectTags(bucketName, objectName);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 }

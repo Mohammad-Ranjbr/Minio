@@ -425,6 +425,7 @@ public class MinioServiceImpl implements MinioService {
         return message;
     }
 
+
     @Override
     public String setObjectTags(String bucketName, String objectName) {
         String message = "";
@@ -443,6 +444,24 @@ public class MinioServiceImpl implements MinioService {
             logger.warn(message);
         }
         return message;
+    }
+
+    @Override
+    public String getObjectTags(String bucketName, String objectName) {
+        StringBuilder result = new StringBuilder();
+        if(bucketExists(bucketName)){
+            try{
+                Tags tags =
+                        minioClient.getObjectTags(GetObjectTagsArgs.builder().bucket(bucketName).object(objectName).build());
+                result.append(tags.get().toString());
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            result.append(bucketName).append(" does not exists");
+            logger.warn(result.toString());
+        }
+        return result.toString();
     }
 
     private StringBuilder createContent(){
