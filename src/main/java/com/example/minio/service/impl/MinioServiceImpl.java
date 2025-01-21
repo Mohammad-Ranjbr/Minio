@@ -517,6 +517,33 @@ public class MinioServiceImpl implements MinioService {
         return message;
     }
 
+    @Override
+    public String removeObjects(String bucketName) {
+        StringBuilder result = new StringBuilder();
+        if(bucketExists(bucketName)){
+            try{
+                List<DeleteObject> deleteObjects = new ArrayList<>();
+                deleteObjects.add(new DeleteObject("Object3"));
+                deleteObjects.add(new DeleteObject("Object4"));
+
+                Iterable<Result<DeleteError>> results =
+                        minioClient.removeObjects(RemoveObjectsArgs.builder().bucket(bucketName).objects(deleteObjects).build());
+                result.append("Objects remove successfully");
+                for(Result<DeleteError> r:results){
+                    DeleteError error = r.get();
+                    result.append("Error in deleting object ").append(error.objectName())
+                            .append("; ").append(error.message());
+                }
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            result.append(bucketName).append(" does not exists");
+            logger.warn(result.toString());
+        }
+        return result.toString();
+    }
+
     private StringBuilder createContent(){
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 1000; i++) {

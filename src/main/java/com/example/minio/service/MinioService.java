@@ -26,5 +26,6 @@ public interface MinioService {
     String deleteObjectTags(String bucketName, String objectName);
     String removeBucket(String bucketName);
     String removeObject(String bucketName, String objectName);
+    String removeObjects(String bucketName);
 
 }
