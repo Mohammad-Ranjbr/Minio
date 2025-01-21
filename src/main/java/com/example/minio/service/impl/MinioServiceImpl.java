@@ -3,10 +3,7 @@ package com.example.minio.service.impl;
 import com.example.minio.service.MinioService;
 import io.minio.*;
 import io.minio.errors.MinioException;
-import io.minio.messages.Bucket;
-import io.minio.messages.Item;
-import io.minio.messages.SseConfiguration;
-import io.minio.messages.VersioningConfiguration;
+import io.minio.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -337,6 +334,26 @@ public class MinioServiceImpl implements MinioService {
                     result.append(new String(buf, 0, readBytes, StandardCharsets.UTF_8));
                 }
                 stream.close();
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            result.append(bucketName).append(" does not exists");
+            logger.warn(result.toString());
+        }
+        return result.toString();
+    }
+
+    @Override
+    public String getBucketLifecycle(String bucketName) {
+        StringBuilder result = new StringBuilder();
+        if(bucketExists(bucketName)){
+            try{
+                LifecycleConfiguration configuration =
+                        minioClient.getBucketLifecycle(GetBucketLifecycleArgs.builder().bucket(bucketName).build());
+                result.append(bucketName)
+                        .append(" configuration: ")
+                        .append(configuration);
             } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
                 logger.error("Error occurred: " + exception);
             }

@@ -98,4 +98,10 @@ public class MinioController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @GetMapping("/buckets/{bucket-name}/lifeCycle")
+    public ResponseEntity<String> getBucketLifecycle(@PathVariable("bucket-name") String bucketName){
+        String result = minioService.getBucketLifecycle(bucketName);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 }
