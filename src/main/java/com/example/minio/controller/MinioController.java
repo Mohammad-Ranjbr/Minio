@@ -1,8 +1,6 @@
 package com.example.minio.controller;
 
 import com.example.minio.service.MinioService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +13,6 @@ import java.util.List;
 public class MinioController {
 
     private final MinioService minioService;
-    private final static Logger logger = LoggerFactory.getLogger(MinioController.class);
 
     @Autowired
     public MinioController(MinioService minioService){
