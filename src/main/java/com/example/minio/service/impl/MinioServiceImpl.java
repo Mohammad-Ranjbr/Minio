@@ -378,6 +378,7 @@ public class MinioServiceImpl implements MinioService {
                 Map<String, String> tags = new HashMap<>();
                 tags.put("Project", "Integration Minio and Spring Boot");
                 tags.put("User", "Mohammad Ranjbar");
+                tags.put("A","a");
                 minioClient.setBucketTags(SetBucketTagsArgs.builder().bucket(bucketNam).tags(tags).build());
                 message = "Tags have been successfully set for bucket: " + bucketNam;
             } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
@@ -388,6 +389,24 @@ public class MinioServiceImpl implements MinioService {
             logger.warn(message);
         }
         return message;
+    }
+
+    @Override
+    public String getBucketTags(String bucketName) {
+        StringBuilder result = new StringBuilder();
+        if(bucketExists(bucketName)){
+            try{
+                Tags tags =
+                        minioClient.getBucketTags(GetBucketTagsArgs.builder().bucket(bucketName).build());
+                result.append(tags.get().toString());
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            result.append(bucketName).append(" does not exists");
+            logger.warn(result.toString());
+        }
+        return result.toString();
     }
 
     private StringBuilder createContent(){
