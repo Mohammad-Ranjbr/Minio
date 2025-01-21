@@ -464,6 +464,23 @@ public class MinioServiceImpl implements MinioService {
         return result.toString();
     }
 
+    @Override
+    public String deleteObjectTags(String bucketName, String objectName) {
+        String message = "";
+        if(bucketExists(bucketName)){
+            try {
+                minioClient.deleteObjectTags(DeleteObjectTagsArgs.builder().bucket(bucketName).object(objectName).build());
+                message = "Object tags deleted successfully";
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else{
+            message = bucketName + " does not exists";
+            logger.warn(message);
+        }
+        return message;
+    }
+
     private StringBuilder createContent(){
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 1000; i++) {
