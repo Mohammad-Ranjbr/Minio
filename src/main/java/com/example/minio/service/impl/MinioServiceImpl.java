@@ -481,6 +481,25 @@ public class MinioServiceImpl implements MinioService {
         return message;
     }
 
+    @Override
+    public String removeBucket(String bucketName) {
+        // Remove bucket if it exists.
+      // This operation will only work if your bucket is empty.
+        String message = "";
+        if(bucketExists(bucketName)){
+            try {
+                minioClient.removeBucket(RemoveBucketArgs.builder().bucket(bucketName).build());
+                message = bucketName + " remove successfully";
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else{
+            message = bucketName + " does not exists";
+            logger.warn(message);
+        }
+        return message;
+    }
+
     private StringBuilder createContent(){
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 1000; i++) {
