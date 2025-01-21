@@ -544,6 +544,33 @@ public class MinioServiceImpl implements MinioService {
         return result.toString();
     }
 
+    @Override
+    public String copyObject(String sourceBucketName, String sourceObjectName, String bucketName, String objectName) {
+        StringBuilder message = new StringBuilder();
+        if (bucketExists(sourceBucketName) && bucketExists(bucketName)){
+            try{
+                minioClient.copyObject(CopyObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(objectName)
+                        .source(
+                                CopySource.builder()
+                                        .bucket(sourceBucketName)
+                                        .object(sourceObjectName)
+                                        .build()
+                        ).build());
+                message.append(sourceBucketName).append("/").append(sourceObjectName)
+                        .append(" copied to ").append(bucketName).append("/").append(objectName).append(" successfully");
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            message.append(sourceBucketName).append(" or ").append(bucketName)
+                    .append(" does not exists");
+            logger.warn(message.toString());
+        }
+        return message.toString();
+    }
+
     private StringBuilder createContent(){
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 1000; i++) {

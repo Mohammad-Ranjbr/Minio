@@ -27,5 +27,6 @@ public interface MinioService {
     String removeBucket(String bucketName);
     String removeObject(String bucketName, String objectName);
     String removeObjects(String bucketName);
+    String copyObject(String sourceBucketName, String sourceObjectName, String bucketName, String objectName);
 
 }

@@ -158,4 +158,11 @@ public class MinioController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
+    @PostMapping("/objects/copy")
+    public ResponseEntity<String> copyObject(@RequestParam String sourceBucketName, @RequestParam String sourceObjectName,
+                                             @RequestParam String bucketName, @RequestParam String objectName){
+        String message = minioService.copyObject(sourceBucketName, sourceObjectName, bucketName, objectName);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
 }
