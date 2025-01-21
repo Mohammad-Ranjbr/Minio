@@ -146,4 +146,10 @@ public class MinioController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
+    @DeleteMapping("/buckets/{bucket-name}/objects/{object-name}/remove")
+    public ResponseEntity<String> removeObject(@PathVariable("bucket-name") String bucketName, @PathVariable("object-name")String objectName){
+        String message = minioService.removeObject(bucketName, objectName);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
 }
