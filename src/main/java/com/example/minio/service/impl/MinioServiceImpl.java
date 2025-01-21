@@ -292,6 +292,39 @@ public class MinioServiceImpl implements MinioService {
         return message;
     }
 
+    @Override
+    public String getObjectVersions(String bucketName, String objectName) {
+        // Typically, the first version of an object in MinIO or S3 has a null versionId.
+        // When versioning is newly enabled, if an object already exists in the bucket, the initial version of that object will be null, because no version was stored before versioning was enabled.
+        // After versioning is enabled, all new operations (such as uploads or edits) will have a unique versionId.
+        // The first version stored without a versionId is considered the default or master version.
+        StringBuilder versionsContent = new StringBuilder();
+        if(bucketExists(bucketName)){
+            try{
+                Iterable<Result<Item>> results = minioClient.listObjects(
+                        ListObjectsArgs.builder().bucket(bucketName).prefix(objectName).includeVersions(true).build());
+
+                for(Result<Item> result:results){
+                    Item item = result.get();
+                    versionsContent.append("Version ID: ")
+                            .append(item.versionId() != null ? item.versionId() : "null")
+                            .append(", Last Modified: ")
+                            .append(item.lastModified())
+                            .append(", Size: ")
+                            .append(item.size())
+                            .append(" Bytes")
+                            .append("\n");
+                }
+            } catch (MinioException | IOException | NoSuchAlgorithmException |  InvalidKeyException exception){
+                logger.error("Error occurred: " + exception);
+            }
+        } else {
+            versionsContent.append(bucketName).append(" does not exists");
+            logger.warn(versionsContent.toString());
+        }
+        return versionsContent.toString();
+    }
+
     private StringBuilder createContent(){
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 1000; i++) {

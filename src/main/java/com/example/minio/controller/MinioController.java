@@ -88,4 +88,10 @@ public class MinioController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
+    @GetMapping("/buckets/{bucket-name}/Object/{object-name}/versions")
+    public ResponseEntity<String> getObjectVersions(@PathVariable("bucket-name") String bucketName, @PathVariable("object-name") String objectName){
+        String result = minioService.getObjectVersions(bucketName, objectName);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 }
